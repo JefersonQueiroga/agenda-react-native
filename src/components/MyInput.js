@@ -12,11 +12,11 @@ import {
 } from 'react-native';
 import { AntDesign } from '@expo/vector-icons'; 
 
-export function MyInput(props){
+export function MyInput(props){ 
     
     return(
             <View style={styles.viewInput}>
-                <AntDesign name={props.iconName} size={24} color="black"  />
+             <AntDesign name={props.iconName} size={24} color="black"  />
                 <TextInput
                     placeholder={props.textInput}
                     placeholderTextColor="#555"

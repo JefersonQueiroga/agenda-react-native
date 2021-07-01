@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Text, View,StyleSheet,TouchableOpacity,FlatList } from 'react-native';
 import { MyInput } from '../components/MyInput';
-
-
+import { ItemContact } from '../components/ItemContact';
 export function Home(){
+   
     const [user,setUser] = useState('');
     const [phone,setPhone] = useState('');
     const [contacts,setContacts] = useState([]);
@@ -14,10 +14,14 @@ export function Home(){
             name: user,
             phone: phone
         }
-        console.log(data)
-        setContacts(oldState => [...oldState,data]);
+        
+        setContacts(oldValue => [...oldValue,data]);
         setUser("");
         setPhone("");
+    }
+
+    function handleDeleteContact( id ) {
+        setContacts( contacts.filter( item => item.id != id ) )
     }
 
     return(
@@ -27,21 +31,26 @@ export function Home(){
             </View>
             
             <View style={styles.formContainer}>
-                <MyInput iconName="user" textInput="Digite o nome" value={user} onChangeText={setUser}/> 
+                <MyInput iconName="user" textInput="Digite o nome" value={user} onChangeText={setUser} /> 
                 <MyInput iconName="phone" textInput="Digite o telefone" value={phone} onChangeText={setPhone} keyboardType="numeric" /> 
 
                 <TouchableOpacity style={ styles.button } onPress={handleSaveContacts}>
                     <Text style={styles.buttonText}>Salvar</Text>
                 </TouchableOpacity>
             </View>
+
+           <View style={styles.list}>  
+                <Text style={styles.titleList}>Lista de Contatos</Text>
+               
+                <FlatList  data={contacts}  
+                    keyExtractor={item => item.id} 
+                    renderItem={ ({item}) =>  (
+                        <ItemContact nome={ item.name } phone={item.phone} apagar={ () => handleDeleteContact(item.id) }/>
+                    ) }
+                /> 
+            </View>
            
-            <Text>{ contacts.length }</Text>
-            <FlatList  data={contacts}  
-                keyExtractor={item => item.id} 
-                renderItem={ ({item}) =>  (
-                   <Text>{item.name}</Text>
-                ) }
-            /> 
+            
         </View>
 
     );
@@ -75,7 +84,7 @@ const styles = StyleSheet.create({
     },
     button: {
         backgroundColor: '#613EEA',
-        padding: 15,
+        padding: 10,
         borderRadius: 7,
         alignItems: 'center',
         marginTop: 20,
@@ -86,6 +95,15 @@ const styles = StyleSheet.create({
         fontSize: 17,
         fontWeight: 'bold',
     },
+    list:{
+        width: "90%",
+    },
+    titleList:{
+        marginTop: 40,
+        fontSize: 25,
+        fontWeight: 'bold',
+        textAlign: 'center'
+    }
 
 });
 
