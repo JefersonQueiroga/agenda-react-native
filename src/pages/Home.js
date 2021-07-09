@@ -1,28 +1,61 @@
-import React, { useState } from 'react';
-import { Text, View,StyleSheet,TouchableOpacity,FlatList } from 'react-native';
+import React, { useState, useEffect} from 'react';
+import { Text, View,StyleSheet,TouchableOpacity,FlatList, Alert, Keyboard } from 'react-native';
 import { MyInput } from '../components/MyInput';
 import { ItemContact } from '../components/ItemContact';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 export function Home(){
-   
+    
+    const keyAsyncStorage = "@agenda1:contatos";
+
     const [user,setUser] = useState('');
     const [phone,setPhone] = useState('');
+    //Vetor dos contatos.
     const [contacts,setContacts] = useState([]);
 
-    function handleSaveContacts() {
+    async function handleSaveContacts() {
         const data ={
             id: String (new Date().getTime()),
             name: user,
             phone: phone
         }
-        
-        setContacts(oldValue => [...oldValue,data]);
+
+        const vetData = [...contacts, data ]; 
+
+        try{
+             await AsyncStorage.setItem(keyAsyncStorage, JSON.stringify( vetData ) );
+        }catch(error){
+            Alert.alert("Erro na gravação de contatos");
+        } 
+
+        Keyboard.dismiss();
         setUser("");
         setPhone("");
+        loadData();
+        
     }
 
-    function handleDeleteContact( id ) {
-        setContacts( contacts.filter( item => item.id != id ) )
+    async function handleDeleteContact( id ) {
+        const newData = contacts.filter( item => item.id != id );
+        await AsyncStorage.setItem(keyAsyncStorage, JSON.stringify( newData ));
+        
+        setContacts(newData); 
     }
+
+    async function loadData(){
+        try{
+            const retorno = await AsyncStorage.getItem(  keyAsyncStorage  );   
+            const teste = JSON.parse( retorno )
+            console.log( teste );
+            setContacts( teste || [] );
+        }catch(error){
+            Alert.alert("Erro na leitura dos dados");
+        }
+    }
+
+    useEffect( ()=>{
+        loadData();      
+    } , []);
 
     return(
         <View style={ styles.container}>
@@ -106,4 +139,3 @@ const styles = StyleSheet.create({
     }
 
 });
-
